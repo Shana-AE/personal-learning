@@ -353,6 +353,161 @@ f([1, 2]);
 
 You can create a variable for the remaining items in a list using the syntax `...`:
 
+```javascript
 let [first, ...rest] = [1, 2, 3, 4];
 console.log(first); // outputs 1
 console.log(rest); // outputs [ 2, 3, 4 ]
+```
+
+Of course, since this is JavaScript, you can just ignore trailing elements you don’t care about:Of course, since this is JavaScript, you can just ignore trailing elements you don’t care about:
+
+```javascript
+let [first] = [1, 2, 3, 4];
+console.log(first);
+```
+
+or other elements:
+
+```javascript
+let [, second, , fourth] = [1, 2, 3, 4];
+```
+
+#### Object destructuring
+
+You can also destructure objects:
+
+```javascript
+let o = {
+    a: "foo",
+    b: 12,
+    c: "bar"
+};
+let {a, b} = o;
+```
+
+This creates new variables `a` and `b` from `o.a` and `o.b`. Notice that you can skip `c` if you don't need it.
+
+Like array destructuring, you can have assignment without declaration:
+
+```javascript
+({ a, b } = { a: "baz", b: 101 });
+```
+
+Notice that we had to surround this statement with paranthses. Javascript normally parses a `{` as the start of block.
+
+You can create a variable for the remaining items in an object using the syntax `...`:
+
+```javascript
+let { a, ...passthrough } = o;
+let total = passthrough.b + passthrough.c.length;
+```
+
+#### Property renaming
+
+You can alse give different names to properties:
+
+```javascript
+let {a: newName1, b: newName2 } = o;
+```
+
+Here the syntax starts to get confusing. You can read: `a: newName1` as "`a` as `newName1`". The direction is left-to-right, as if you had written:
+
+```javascript
+let newName1 = o.a;
+let newName2 = o.b;
+```
+
+Confusingly, the colon here does *not* indicate the type. The type, if you specify it, still needs to be written after the entire destructuring:
+
+```typescript
+let { a, b }: { a: string, b: number } = o;
+```
+
+#### Default values
+
+Default values let you specify a default value in case a property is undefined:
+
+```typescript
+function keepWholeObject(wholeObject: { a: string, b?: number }) {
+    let { a, b = 1001 } = wholeObject;
+}
+```
+
+`keepWholeObject` now has a variable for `wholeObject` as well as the properties `a` and `b`, even if `b` is undefined.
+
+#### Function declarations
+
+Destructuring also works in function declarations. For simple cases this is straightforward:
+
+```typescript
+type C = { a: string, b?: number };
+function f({ a, b }: C): void {
+    // ...
+}
+```
+
+But specifying defaults is more common for parameters, and getting defaults right with destructuring can be tricky. First of all, you need to remember to put the pattern before the default value.
+
+```typescript
+function f({ a="", b=0 } = {}): void {
+    // ...
+}
+f();
+```
+
+Then, you need to remember to give a default for optional properties on the destructured property instead of the main initializer. Remember that `C` was defined with `b` optional:
+
+```typescript
+function f({ a, b = 0 } = { a: "" }): void {
+    // ...
+}
+f({ a: "yes" }); // ok, default b = 0
+f(); // ok, default to { a: "" }, which then defaults b = 0
+f({}); // error, 'a' is required if you supply an argument
+```
+
+Use destructuring with care. As the previous example demonstrates, anything but the simplest destructuring expression is confusing. This is especially true with deeply nested destructuring, which gets *really* hard to understand even without piling on renaming, default values, and type annotations. Try to keep destructuring expressions small and simple. You can always write the assignments that destructuring would generate yourself.
+
+#### Spread
+
+The spread operator is the opposite of destructuring. It allows you to spread an array into another array, or an object into another object.
+
+```javascript
+let first = [1, 2];
+let second = [3, 4];
+let bothPlus = [0, ...first, ...second, 5];
+```
+
+THis gives `bothPlus` the value `[0, 1, 2, 3, 4, 5]`. Spreading creates a *shallow copy* of `first` and `second`. They are not changed by the spread.
+
+You can also spread objects:
+
+```typescript
+let defaults = { food: "spicy", price: "$$", ambiance: "noisy" };
+let search = { ...defaults, food: "rich" };
+```
+
+Now `search` is `{ food: "rich", price: "$$", ambiance: "noisy" }`. Object spreading is more complex than array spreading. Like array spreading, it proceeds from left-to-right, but the result is still an object. This means that properties taht com later in the spread object overwrite properties that com earlier. So if we modify the previous example to spread at the end:
+
+```typescript
+let defaults = { food: "spicy", price: "$$", ambiance: "noisy" };
+let search = { food: "rich", ...defaults };
+```
+
+Then the `food` property in `defaults` overwrites `food: "rich"`, which is not what we want in this case.
+
+Object spread also has a couple of other surprising limits. First, it only includes an objects[’ own, enumerable properties](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties). Basically, that means you lose methods when you spread instances of an object:
+
+```typescript
+class C {
+  p = 12;
+  m() {
+  }
+}
+let c = new C();
+let clone = { ...c };
+clone.p; // ok
+clone.m(); // error!
+```
+
+Second, the Typescript compiler doesn’t allow spreads of type parameters from generic functions. That feature is expected in future versions of the language.
