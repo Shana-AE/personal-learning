@@ -8,7 +8,7 @@ class Grid {
   }
 
   calculateDistanceFromOrigin(point: {x: number; y: number}) {
-    // 
+    // you can use Grid.origin.x since it's static
     let xDist = point.x - Grid.origin.x;
     let yDist = point.y - Grid.origin.y;
     return Math.sqrt(xDist * xDist + yDist * yDist) * this.scale;
