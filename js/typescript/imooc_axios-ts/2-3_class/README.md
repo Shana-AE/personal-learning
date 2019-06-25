@@ -255,3 +255,105 @@ console.log(grid1.calculateDistanceFromOrigin({x:3, y: 4}));
 
 console.log(grid2.calculateDistanceFromOrigin({x: 3, y: 4}));
 ```
+
+## abstract
+
+```typescript
+abstract class Animal {
+  abstract makeSound(): void;
+  move(): void {
+    console.log('roaming the earth...');
+  }
+}
+
+```
+
+```typescript
+abstract class Department {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  printName(): void {
+    console.log('Department name ' + this.name);
+  }
+
+  abstract printMeeting(): void;
+}
+
+class AccountingDepartment extends Department {
+  constructor() {
+    super('Accounting and Auditing');
+  }
+
+  printMeeting(): void {
+    console.log('The Accounting Department meets each Monday at 10am.');
+  }
+
+  generateReports(): void {
+    console.log('Generating accounting reports...');
+  }
+}
+
+let department: Department;
+// error, we cannot directly use the abstract class.
+// department = new Department();
+department = new AccountingDepartment();
+department.printName();
+department.printMeeting();
+// error, we cannot use this method because the abstract class doesn't have the method.
+// department.generateReports();
+```
+
+## advanced technology
+
+```typescript
+class Greeter {
+  static standardGreeting = 'Hello, there';
+
+  greeting: string;
+
+  constructor(message?: string) {
+    this.greeting = message;
+  }
+
+  greet() {
+    if (this.greeting) {
+      return 'Hello, ' + this.greeting;
+    } else {
+      return Greeter.standardGreeting;
+    }
+  }
+}
+
+let greeter: Greeter;
+greeter = new Greeter('world');
+let greeter1: Greeter = new Greeter();
+console.log(greeter.greet());
+console.log(greeter1.greet());
+// typeof make the greetMaker become the Greeter type, and it can overwrite the static property.
+let greeterMaker: typeof Greeter = Greeter;
+greeterMaker.standardGreeting = 'Hey there';
+
+let greeter2: Greeter = new greeterMaker();
+let greeter3: Greeter = new Greeter();
+console.log(greeter2.greet());
+console.log(greeter2.greet());
+```
+
+we can also use class as interface, but not recommended.
+
+```typescript
+class Point {
+  x: number;
+  y: number;
+}
+
+interface Point3d extends Point {
+  z: number;
+}
+
+let point3d: Point3d = {x: 1, y: 2, z: 3};
+```
