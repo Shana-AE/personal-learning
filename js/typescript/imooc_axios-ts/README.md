@@ -8,3 +8,4 @@
 6. [class](2-3_class)
 7. [function](2-4_function)
 8. [generics](2-5_generics)
+9. [type inference](2-6_type_inference)
