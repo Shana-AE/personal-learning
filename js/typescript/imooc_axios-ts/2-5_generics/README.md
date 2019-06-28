@@ -126,7 +126,7 @@ loggingIdentity({length: 1});
  * `K` should be the key of the `T`
  * then we can constraint `key` should 
  * be in the `obj`.
- * 
+ *
  */
 function getProperty<T, K extends keyof T>(obj: T, key: K) {
   return obj[key];
