@@ -9,3 +9,4 @@
 7. [function](2-4_function)
 8. [generics](2-5_generics)
 9. [type inference](2-6_type_inference)
+10. [advanced types](2-7_advanced_types)
